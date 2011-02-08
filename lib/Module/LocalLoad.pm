@@ -120,6 +120,28 @@ defined and points to a directory that'll be our new lib/.
 If the directory already contains a copy of the package, we go ahead and load
 it, else we must first copy it.
 
+=head1 EXAMPLES
+
+You want to much around in the inner working of the IO::File module.
+
+  # io-file-hack.pl
+  use Module::LocalLoad;
+
+  my $m = 'IO::File';
+  my $f = $m;
+  $f =~ s{::}{/}g;
+
+  load($m) and printf("%s v%s loaded - %s\n", $m, $m->VERSION, $INC{"$f.pm"});
+
+This will produce something like:
+
+  IO::File v1.14 loaded - /tmp/lib/IO/File.pm
+
+Next up, go make some changes to /tmp/lib/IO/File.pm . Don't forget to change
+the version!
+
+  IO::File v1.14-hack loaded
+XXX
 
 =head1 ENVIRONMENT
 
