@@ -1,7 +1,7 @@
 package Module::LocalLoad;
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.026';
+$VERSION = '0.028';
 
 use Carp();
 use File::Copy();
@@ -100,10 +100,6 @@ are working on right now. See the L</EXAMPLES> section.
 
 =head1 EXPORTS
 
-None by default.
-
-=head1 FUNCTIONS
-
 =head2 load()
 
 =over 4
@@ -115,14 +111,14 @@ None by default.
 =back
 
 When load() is called with a valid, globally installed package name several
-things happen. First, we check if the environment variable PERL5HACKLIB is
+things happen. First, we check if the environment variable C<PERL5HACKLIB> is
 defined and points to a directory that'll be our new lib/.
 If the directory already contains a copy of the package, we go ahead and load
 it, else we must first copy it.
 
 =head1 EXAMPLES
 
-You want to much around in the inner working of the IO::File module.
+You want to muck around in the inner workings of the IO::File module.
 
   # io-file-hack.pl
   use Module::LocalLoad;
@@ -138,23 +134,30 @@ This will produce something like:
   IO::File v1.14 loaded - /tmp/lib/IO/File.pm
 
 Next up, go make some changes to /tmp/lib/IO/File.pm . Don't forget to change
-the version!
+the $VERSION variable!
 
-  IO::File v1.14-hack loaded
-XXX
+  vim /tmp/lib/IO/File.pm
+
+  IO::File v1.14.1 loaded - /tmp/lib/IO/File.pm
 
 =head1 ENVIRONMENT
 
-PERL5HACKLIB
+=over 4
+
+=item PERL5HACKLIB
+
+=back
+
+Where the temporary lib should be set up.
 
 =head1 AUTHOR
 
-     \ \ | / /
-      \ \ - /
-       \ | /
-       (O O)
-       ( < )
-       (-=-)
+    \ \ | / /
+     \ \ - /
+      \ | /
+      (O O)
+      ( < )
+      (-=-)
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
@@ -167,8 +170,8 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2011 B<Module::LocalLoad>s L</AUTHOR> and L</CONTRIBUTORS> as listed
-above.
+Copyright 2011 the B<Module::LocalLoad> L</AUTHOR> and L</CONTRIBUTORS> as
+listed above.
 
 =head1 LICENSE
 
