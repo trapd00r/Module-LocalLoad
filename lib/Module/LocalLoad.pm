@@ -1,7 +1,7 @@
 package Module::LocalLoad;
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.028';
+$VERSION = '0.030';
 
 use Carp();
 use File::Copy();
@@ -24,7 +24,8 @@ sub load {
 
   my $mod_file = _get_base_filename( $mod );
 
-  my $PERL5HACKLIB = $ENV{PERL5HACKLIB} // '/tmp';
+  my $PERL5HACKLIB = $ENV{PERL5HACKLIB};
+  defined $PERL5HACKLIB or $PERL5HACKLIB = '/tmp';
 
   if( ($PERL5HACKLIB !~ /lib/) or (!('lib' ~~ glob("$PERL5HACKLIB/*"))) ) {
     $PERL5HACKLIB .= '/lib';
