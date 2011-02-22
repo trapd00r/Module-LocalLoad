@@ -15,21 +15,18 @@ DESCRIPTION
     that you are working on right now. See the "EXAMPLES" section.
 
 EXPORTS
-    None by default.
-
-FUNCTIONS
   load()
     Arguments: $package
     Return value: Boolean
 
     When load() is called with a valid, globally installed package name
     several things happen. First, we check if the environment variable
-    PERL5HACKLIB is defined and points to a directory that'll be our new
+    "PERL5HACKLIB" is defined and points to a directory that'll be our new
     lib/. If the directory already contains a copy of the package, we go
     ahead and load it, else we must first copy it.
 
 EXAMPLES
-    You want to much around in the inner working of the IO::File module.
+    You want to muck around in the inner workings of the IO::File module.
 
       # io-file-hack.pl
       use Module::LocalLoad;
@@ -45,21 +42,24 @@ EXAMPLES
       IO::File v1.14 loaded - /tmp/lib/IO/File.pm
 
     Next up, go make some changes to /tmp/lib/IO/File.pm . Don't forget to
-    change the version!
+    change the $VERSION variable!
 
-      IO::File v1.14-hack loaded
-    XXX
+      vim /tmp/lib/IO/File.pm
+
+      IO::File v1.14.1 loaded - /tmp/lib/IO/File.pm
 
 ENVIRONMENT
     PERL5HACKLIB
 
+    Where the temporary lib should be set up.
+
 AUTHOR
-         \ \ | / /
-          \ \ - /
-           \ | /
-           (O O)
-           ( < )
-           (-=-)
+        \ \ | / /
+         \ \ - /
+          \ | /
+          (O O)
+          ( < )
+          (-=-)
 
       Magnus Woldrich
       CPAN ID: WOLDRICH
@@ -70,8 +70,8 @@ CONTRIBUTORS
     None required yet.
 
 COPYRIGHT
-    Copyright 2011 Module::LocalLoads "AUTHOR" and "CONTRIBUTORS" as listed
-    above.
+    Copyright 2011 the Module::LocalLoad "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
 
 LICENSE
     This library is free software; you can redistribute it and/or modify it
