@@ -1,14 +1,11 @@
 package Module::LocalLoad;
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.040';
+$VERSION = '0.150';
 
 use Carp();
 use File::Copy();
 use File::Path();
-use Directory::Scratch();
-use Module::ScanDeps();
-use Data::Dumper;
 
 
 my $PERL5HACKLIB;
@@ -23,21 +20,16 @@ sub import {
 }
 
 sub load {
-  my $module = shift or return; # IO::File
+  my $module = shift or return;
 
-  my $who    = (caller(1))[0];
-  unshift(@INC, $PERL5HACKLIB) unless $INC[0] eq $PERL5HACKLIB;
-
-  # XXX load('IO::File') should be possible
-  # Determine if a file or a module is to be loaded
-
-  $PERL5HACKLIB   = $ENV{PERL5HACKLIB};
-  my $slashed_module = _colon_to_slash( $module ); # IO/File
-  #my $slashed_module = _colon_to_slash( $module ); # IO/File
+  my $who = (caller(1))[0];
+  $PERL5HACKLIB = $ENV{PERL5HACKLIB};
 
   if(!defined($PERL5HACKLIB)) {
-    $PERL5HACKLIB = './localload';
+    Carp::croak("Environment variable \$PERL5HACKLIB not set! Aborting.\n");
   }
+
+  my $slashed_module = _colon_to_slash( $module );
 
   if(! -d "$PERL5HACKLIB/$slashed_module") {
     File::Path::make_path("$PERL5HACKLIB/$slashed_module")
@@ -49,7 +41,6 @@ sub load {
     if($dir_in_inc eq $PERL5HACKLIB) {
       next;
     }
-            # /usr/lib/perl5/site_perl/IO/File.pm
     if( -f "$dir_in_inc/$slashed_module.pm") {
       $found_pm = "$dir_in_inc/$slashed_module.pm";
       last;
@@ -65,6 +56,7 @@ sub load {
       or croak("Can not copy $found_pm to $PERL5HACKLIB/$slashed_module.pm: $!");
   }
 
+  unshift(@INC, $PERL5HACKLIB) unless $INC[0] eq $PERL5HACKLIB;
 
   eval "require $module";
   $@ ? Carp::croak("Error loading $module: $@\n") : return 1;
@@ -75,7 +67,6 @@ sub _colon_to_slash {
   $module =~ s{::}{/}g;
   return $module;
 }
-
 
 
 1;
