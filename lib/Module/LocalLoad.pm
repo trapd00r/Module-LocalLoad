@@ -1,12 +1,17 @@
 package Module::LocalLoad;
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.034';
+$VERSION = '0.040';
 
 use Carp();
 use File::Copy();
 use File::Path();
+use Directory::Scratch();
+use Module::ScanDeps();
+use Data::Dumper;
 
+
+my $PERL5HACKLIB;
 
 sub import {
   my $who = (caller(1))[0];
@@ -17,57 +22,57 @@ sub import {
   }
 }
 
-
 sub load {
-  my $mod = shift or return;
-  my $who = (caller(1))[0];
+  my $module = shift or return; # IO::File
 
-  my $mod_file = _get_base_filename( $mod );
+  my $who    = (caller(1))[0];
+  unshift(@INC, $PERL5HACKLIB) unless $INC[0] eq $PERL5HACKLIB;
 
-  my $PERL5HACKLIB = $ENV{PERL5HACKLIB};
-  defined $PERL5HACKLIB or $PERL5HACKLIB = '/tmp/lib';
+  # XXX load('IO::File') should be possible
+  # Determine if a file or a module is to be loaded
 
-  $PERL5HACKLIB .= '/lib' if $PERL5HACKLIB !~ /lib/;
+  $PERL5HACKLIB   = $ENV{PERL5HACKLIB};
+  my $slashed_module = _colon_to_slash( $module ); # IO/File
+  #my $slashed_module = _colon_to_slash( $module ); # IO/File
 
-  if(!-d "$PERL5HACKLIB/$mod_file") {
-    File::Path::make_path("$PERL5HACKLIB/$mod_file")
-      or Carp::croak("Cant mkdir '$PERL5HACKLIB/$mod_file'\n");
+  if(!defined($PERL5HACKLIB)) {
+    $PERL5HACKLIB = './localload';
   }
 
-  my $module_in_inc;
-  for my $d(@INC) {
-    if(-f "$d/$mod_file.pm") {
-      $module_in_inc = "$d/$mod_file.pm";
+  if(! -d "$PERL5HACKLIB/$slashed_module") {
+    File::Path::make_path("$PERL5HACKLIB/$slashed_module")
+      or Carp::croak("Cant mkdir $PERL5HACKLIB/$slashed_module: $!\n");
+  }
+
+  my $found_pm;
+  for my $dir_in_inc(@INC) {
+    if($dir_in_inc eq $PERL5HACKLIB) {
+      next;
+    }
+            # /usr/lib/perl5/site_perl/IO/File.pm
+    if( -f "$dir_in_inc/$slashed_module.pm") {
+      $found_pm = "$dir_in_inc/$slashed_module.pm";
       last;
     }
   }
 
-  if(!defined($module_in_inc)) {
-    Carp::croak "No such module '$mod' in \@INC\n";
+  if(!defined($found_pm)) {
+    Carp::croak("Could not find $module in \@INC\n");
   }
 
-  unshift(@INC, $PERL5HACKLIB);
-
-  my $base = _get_base_class( $mod_file );
-
-  if(!-f "$PERL5HACKLIB/$mod_file.pm") {
-    File::Copy::copy($module_in_inc, "$PERL5HACKLIB/$base")
-      or Carp::croak("Copy failed: '$module_in_inc' -> '$PERL5HACKLIB/$base'\n");
+  if(! -f "$PERL5HACKLIB/$slashed_module.pm") {
+    File::Copy::copy($found_pm, "$PERL5HACKLIB/$slashed_module.pm")
+      or croak("Can not copy $found_pm to $PERL5HACKLIB/$slashed_module.pm: $!");
   }
 
-  eval "require $mod";
-  $@ ? Carp::croak $@ : return 1;
+
+  eval "require $module";
+  $@ ? Carp::croak("Error loading $module: $@\n") : return 1;
 }
 
-sub _get_base_class {
+sub _colon_to_slash {
   my $module = shift;
-  my($base) = $module =~ m|^(.+)/.*$|;
-  return $base;
-}
-
-sub _get_base_filename {
-  my $module = shift;
-  $module =~ s|::|/|g;
+  $module =~ s{::}{/}g;
   return $module;
 }
 
@@ -122,6 +127,7 @@ You want to muck around in the inner workings of the IO::File module.
 
   # io-file-hack.pl
   use Module::LocalLoad;
+
 
   my $m = 'IO::File';
   my $f = $m;
