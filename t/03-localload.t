@@ -5,19 +5,17 @@ use Module::LocalLoad;
 
 
 subtest 'Localload' => sub {
-  load('IO::File');
+  plan skip_all => 'load() tested on dev box' if !exists($ENV{RELEASE});
+  $ENV{PERL5HACKLIB} = '/tmp/';
+  load('Term::ANSIColor');
   my $base = $ENV{PERL5HACKLIB};
-  if(!defined($base)) {
-    $base = './local_lib';
-  }
-  print "BASE IS $base\n", "AND   " . $INC{'IO/File.pm'}, "\n\n";
   ok(
-    $INC{'IO/File.pm'} eq "$base/IO/File.pm",
-    "IO::File loaded | PERL5HACKLIB eq $base",
+    $INC{'Term/ANSIColor.pm'} eq "$base/Term/ANSIColor.pm",
+    "Term::ANSIColor loaded | PERL5HACKLIB eq $base",
   );
-  unlink("$base/IO/File.pm");
-  delete $ENV{PERL5HACKLIB};
-  delete $INC{'IO/File.pm'};
+  #unlink("$base/Term/ANSIColor.pm");
+  #delete $ENV{PERL5HACKLIB};
+  #delete $INC{'Term::ANSIColor'};
 
 
   #load('IO::File');
@@ -28,3 +26,4 @@ subtest 'Localload' => sub {
 };
 
 done_testing();
+
