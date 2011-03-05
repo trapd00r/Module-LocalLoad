@@ -1,6 +1,12 @@
 use strict;
 use Test::More;
 
+unless(exists($ENV{RELEASE_TESTING})) {
+  plan skip_all => 'these tests are for release candidate testing';
+}
+
+plan skip_all => "Pod Coverage tests prior to release" if !exists($ENV{RELEASE});
+
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
 eval "use Test::Pod::Coverage $min_tpc";
