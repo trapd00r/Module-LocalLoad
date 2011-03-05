@@ -4,27 +4,22 @@ use warnings;
 
 use Module::LocalLoad;
 
-my @mod = qw(
-  Term::ExtendedColor
-  Term::ExtendedColor::Xresources
-  Term::ExtendedColor::TTY
-  Daemon::Mplayer
-  Term::ANSIColor
-  Term::ReadKey
-  IO::File
-  IO::Handle
-  IO::Handle
-  Module::CoreList
-  Module::ScanDeps
-);
 
-BEGIN {
-  unshift(@INC, 'localload');
-  print "$_\n" for @INC;
-}
+# Some random core modules
+my @mod = qw(
+  Term::ANSIColor
+  File::Compare
+  Pod::Text::Termcap
+  Memoize::Storable
+  IO::Zlib
+  Pod::InputObjects
+  Module::Build::YAML
+  Text::Wrap
+  Pod::LaTeX
+);
 
 for my $m(@mod) {
   (my $file = $m) =~ s{::}{/}g;
-  $file =~ s{$}{.pm};
-  load($m) and printf("%25.25s v%s loaded - %s\n", $m, $m->VERSION, $INC{$file});
+  $file .= '.pm';
+  load($m)and printf("%20s %9s loaded - %s\n", $m, $m->VERSION, $INC{$file});
 }
