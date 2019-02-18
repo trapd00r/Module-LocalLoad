@@ -2,7 +2,7 @@ package Module::LocalLoad;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.174';
+$VERSION = '0.176';
 
 use Carp();
 use File::Copy();
